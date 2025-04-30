@@ -1,5 +1,6 @@
 import socket
 import threading
+import queue
 
 PUERTO=60000
 
@@ -15,7 +16,7 @@ def recibirCliente():
         print(f"Mensage: {msg}")
 
 def envioCliente():
-    hilo_recibir_Servidor = threading.Thread(target=recibirCliente)
+    hilo_recibir_Servidor = threading.Thread(target=recibirCliente, daemon=True)
     hilo_recibir_Servidor.start()
     
     while True:
@@ -28,38 +29,29 @@ def envioCliente():
 
 
 
-
 def envioServidor():    
     while not stop_event.is_set():
         msg=input("-->")
         if msg=="exit":
             print("No se puede salir porque estas en una conexion")
-            so.send(msg.encode())
-        elif msg=="ffgg83":
-            break
         else:
             so.send(msg.encode())
         
         
 def recibirServidor():   
-    hilo_envio_servidor = threading.Thread(target=envioServidor)
+    hilo_envio_servidor = threading.Thread(target=envioServidor, daemon=True)
     hilo_envio_servidor.start() 
     while not stop_event.is_set():
         msg = so.recv(100).decode("utf-8")
         if msg=="exit":
                 print("Ha abandonado la conversación")
-                so.send("ffgg83")
                 stop_event.set()                
                 break
         else:
             print(f"Mensage: {msg}")
+    hilo_envio_servidor.join()
     stop_event.clear()
     so.close
-
-
-    
-        
-
 
 
 
@@ -114,7 +106,6 @@ match res:
             print("Esperando conexion")
             so,ip=socket_server.accept()
             recibirServidor()  
-            res=None  
             res=input("Quieres Continuar? 1=si, 2=no ")
             if res=="2":
                 print("Has finalizado el servidor.")
