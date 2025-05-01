@@ -65,8 +65,7 @@ while flag:
 
 match res:
     case "1": #cliente
-        socket_cliente=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        socket_cliente.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
         #socket_server.bind(("0.0.0.0",PUERTO))
         #socket_cliente.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         #socket_server.listen(2)
@@ -74,6 +73,8 @@ match res:
         flag=True
         while flag:
             try:
+                socket_cliente=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                socket_cliente.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 ip=input("Dar una IP: ")
                 socket_cliente.connect((ip, PUERTO))  # IP o puerto inexistente
                 print("Se ha conectado")
