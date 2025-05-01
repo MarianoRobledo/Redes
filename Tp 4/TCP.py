@@ -16,7 +16,7 @@ def recibirCliente():
             msn=mensaje.split(":")
             user=msn[0]
             msg=msn[1]
-        print(f"{user} dice: {msg}")
+            print(f"{user} dice: {msg}")
 
 def envioCliente():
     hilo_recibir_Servidor = threading.Thread(target=recibirCliente, daemon=True)
