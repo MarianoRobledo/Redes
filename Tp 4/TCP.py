@@ -12,9 +12,10 @@ stop_event= threading.Event()
 def recibirCliente():
      while not stop_event.is_set():
         mensaje = socket_cliente.recv(100).decode("utf-8")
-        msn=mensaje.split(":")
-        user=msn[0]
-        msg=msn[1]
+        if mensaje!="":
+            msn=mensaje.split(":")
+            user=msn[0]
+            msg=msn[1]
         print(f"{user} dice: {msg}")
 
 def envioCliente():
@@ -23,7 +24,7 @@ def envioCliente():
     print("Inicio de converscion")
     while True:
         mensaje=input("-->")
-        msg=f"{user_name}: {mensaje}"
+        msg=f"{user_name}:{mensaje}"
         socket_cliente.send(msg.encode())
         if mensaje=="exit":
             stop_event.set()
@@ -38,6 +39,8 @@ def envioServidor():
         msg=f"{user_name}: {mensaje}"
         if mensaje=="exit":
             print("No se puede salir porque estas en una conexion")
+        elif mensaje=="":
+            continue
         else:
             so.send(msg.encode())
         
@@ -58,7 +61,7 @@ def recibirServidor():
         else:
             print(f"{user} dice: {msg}")
     stop_event.clear()
-    so=None #unica forma de cerrar el socket ya que al estar en el otro hilo no cierra
+    so.close() 
 
 
 
