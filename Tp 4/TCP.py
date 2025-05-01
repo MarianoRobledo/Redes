@@ -11,18 +11,21 @@ stop_event= threading.Event()
 
 def recibirCliente():
      while not stop_event.is_set():
-        msg = socket_cliente.recv(100).decode("utf-8")
-        
-        print(f"Mensage: {msg}")
+        mensaje = socket_cliente.recv(100).decode("utf-8")
+        msn=mensaje.split(":")
+        user=msn[0]
+        msg=msn[1]
+        print(f"{user} dice: {msg}")
 
 def envioCliente():
     hilo_recibir_Servidor = threading.Thread(target=recibirCliente, daemon=True)
     hilo_recibir_Servidor.start()
-    
+    print("Inicio de converscion")
     while True:
-        msg=input("-->")
+        mensaje=input("-->")
+        msg=f"{user_name}: {mensaje}"
         socket_cliente.send(msg.encode())
-        if msg=="exit":
+        if mensaje=="exit":
             stop_event.set()
             break
     socket_cliente.close()
@@ -31,8 +34,9 @@ def envioCliente():
 
 def envioServidor():    
     while not stop_event.is_set():
-        msg=input("-->")
-        if msg=="exit":
+        mensaje=input("-->")
+        msg=f"{user_name}: {mensaje}"
+        if mensaje=="exit":
             print("No se puede salir porque estas en una conexion")
         else:
             so.send(msg.encode())
@@ -41,17 +45,20 @@ def envioServidor():
 def recibirServidor():   
     hilo_envio_servidor = threading.Thread(target=envioServidor, daemon=True)
     hilo_envio_servidor.start() 
+    print("Inicio de converscion")
     while not stop_event.is_set():
-        msg = so.recv(100).decode("utf-8")
+        mensaje = so.recv(100).decode("utf-8")
+        msn=mensaje.split(":")
+        user=msn[0]
+        msg=msn[1]        
         if msg=="exit":
                 print("Ha abandonado la conversación")
                 stop_event.set()                
                 break
         else:
-            print(f"Mensage: {msg}")
-    hilo_envio_servidor.join()
+            print(f"{user} dice: {msg}")
     stop_event.clear()
-    so.close
+    so=None #unica forma de cerrar el socket ya que al estar en el otro hilo no cierra
 
 
 
@@ -113,7 +120,7 @@ match res:
                 socket_server.close                
                 break
             so.close
-        print("Has finalizado el servidor.")
+
             
         
 
