@@ -1,6 +1,6 @@
 import socket
 import threading
-import queue
+
 
 PUERTO=60000
 
@@ -36,7 +36,7 @@ def envioCliente():
 def envioServidor():    
     while not stop_event.is_set():
         mensaje=input("-->")
-        msg=f"{user_name}: {mensaje}"
+        msg=f"{user_name}:{mensaje}"
         if mensaje=="exit":
             print("No se puede salir porque estas en una conexion")
         elif mensaje=="":
@@ -50,16 +50,20 @@ def recibirServidor():
     hilo_envio_servidor.start() 
     print("Inicio de converscion")
     while not stop_event.is_set():
-        mensaje = so.recv(100).decode("utf-8")
-        msn=mensaje.split(":")
-        user=msn[0]
-        msg=msn[1]        
-        if msg=="exit":
-                print("Ha abandonado la conversación")
-                stop_event.set()                
-                break
-        else:
-            print(f"{user} dice: {msg}")
+        try:
+            mensaje = so.recv(100).decode("utf-8")
+            msn=mensaje.split(":")
+            user=msn[0]
+            msg=msn[1]        
+            if msg=="exit":
+                    print("Ha abandonado la conversación")
+                    stop_event.set()                
+                    break
+            else:
+                print(f"{user} dice: {msg}")
+        except Exception as e:
+            print("Se ha desconectado la conexion")
+            break
     stop_event.clear()
     so.close() 
 
@@ -68,7 +72,7 @@ def recibirServidor():
 user_name=input("Dar tu nombre: ")
 flag=True
 while flag:
-    print("Seleccionar modo \ 1- Enviar mensaje \ 2- Esperar mensaje")
+    print("1) enviar mensaje 2) esperar mensaje")
     res=input()
     if res=="1" or res=="2":
         flag=False
@@ -120,7 +124,7 @@ match res:
             res=input("Quieres Continuar? 1=si, 2=no ")
             if res=="2":
                 print("Has finalizado el servidor.")
-                socket_server.close                
+                socket_server.close()              
                 break
             so.close
 
